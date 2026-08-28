@@ -1,0 +1,70 @@
+# .github/workflows/auto-release.yml
+name: Auto Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - 'release/*'
+
+permissions:
+  contents: write
+
+jobs:
+  auto-release:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - name: Extract version from VERSION file
+        id: extract-tag
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION=$(cat VERSION | tr -d '[:space:]')
+          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "VERSION file must contain a valid semver (major.minor.patch). Got: $VERSION"
+            exit 1
+          fi
+
+          NEW_TAG="v${VERSION}"
+          MAJOR_VERSION=$(echo "$VERSION" | sed -E 's/^([0-9]+)\..*/\1/')
+
+          echo "new_tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
+          echo "major_version=$MAJOR_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create new version tag
+        run: |
+          NEW_TAG="${{ steps.extract-tag.outputs.new_tag }}"
+
+          if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
+            echo "::error::Tag $NEW_TAG already exists. Bump the version instead of reusing it."
+            exit 1
+          fi
+
+          git tag -a "$NEW_TAG" -m "Auto release $NEW_TAG"
+          git push origin "$NEW_TAG"
+
+          echo "✅ Created tag: $NEW_TAG"
+
+      - name: Update major version tag
+        run: |
+          NEW_TAG="${{ steps.extract-tag.outputs.new_tag }}"
+          MAJOR_VERSION="${{ steps.extract-tag.outputs.major_version }}"
+          MAJOR_TAG="v${MAJOR_VERSION}"
+
+          git tag -fa "$MAJOR_TAG" -m "Version ${MAJOR_VERSION} (currently $NEW_TAG)"
+          git push origin "$MAJOR_TAG" --force
+
+          echo "✅ Updated $MAJOR_TAG to point to $NEW_TAG"
