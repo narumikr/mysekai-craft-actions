@@ -1,0 +1,158 @@
+{
+  "miku": {
+    "name": "初音ミク",
+    "icon": "🎵",
+    "color": "33ccba",
+    "birthday": "08-31"
+  },
+  "rin": {
+    "name": "鏡音リン",
+    "icon": "🍊",
+    "color": "ffcc10",
+    "birthday": "12-27"
+  },
+  "len": {
+    "name": "鏡音レン",
+    "icon": "🍌",
+    "color": "feee10",
+    "birthday": "12-27"
+  },
+  "luka": {
+    "name": "巡音ルカ",
+    "icon": "🐟",
+    "color": "ffbbcc",
+    "birthday": "01-30"
+  },
+  "meiko": {
+    "name": "MEIKO",
+    "icon": "🍷",
+    "color": "dd4544",
+    "birthday": "11-05"
+  },
+  "kaito": {
+    "name": "KAITO",
+    "icon": "🍨",
+    "color": "3367cc",
+    "birthday": "02-17"
+  },
+  "ichika": {
+    "name": "星乃 一歌",
+    "icon": "🎸",
+    "color": "33aaee",
+    "birthday": "08-11"
+  },
+  "saki": {
+    "name": "天馬 咲希",
+    "icon": "🎹",
+    "color": "ffc800",
+    "birthday": "05-09"
+  },
+  "honami": {
+    "name": "望月 穂波",
+    "icon": "🥧",
+    "color": "ee6666",
+    "birthday": "10-27"
+  },
+  "shiho": {
+    "name": "日野森 志歩",
+    "icon": "🍜",
+    "color": "bbdd22",
+    "birthday": "01-08"
+  },
+  "minori": {
+    "name": "花里 みのり",
+    "icon": "🌸",
+    "color": "ffc096",
+    "birthday": "04-14"
+  },
+  "haruka": {
+    "name": "桐谷 遥",
+    "icon": "🐧",
+    "color": "99ccff",
+    "birthday": "10-05"
+  },
+  "airi": {
+    "name": "桃井 愛莉",
+    "icon": "🍑",
+    "color": "ffaacc",
+    "birthday": "03-19"
+  },
+  "shizuku": {
+    "name": "日野森 雫",
+    "icon": "💧",
+    "color": "6be6cd",
+    "birthday": "12-06"
+  },
+  "kohane": {
+    "name": "小豆沢 こはね",
+    "icon": "🐹",
+    "color": "ff6699",
+    "birthday": "03-02"
+  },
+  "an": {
+    "name": "白石 杏",
+    "icon": "⭐",
+    "color": "00bbdd",
+    "birthday": "07-26"
+  },
+  "akito": {
+    "name": "東雲 彰人",
+    "icon": "🥞",
+    "color": "ff7722",
+    "birthday": "11-12"
+  },
+  "toya": {
+    "name": "青柳 冬弥",
+    "icon": "☕",
+    "color": "0077dd",
+    "birthday": "05-25"
+  },
+  "tsukasa": {
+    "name": "天馬 司",
+    "icon": "🌟",
+    "color": "ffbb00",
+    "birthday": "05-17"
+  },
+  "emu": {
+    "name": "鳳 えむ",
+    "icon": "🍬",
+    "color": "ff66bb",
+    "birthday": "09-09"
+  },
+  "nene": {
+    "name": "草薙 寧々",
+    "icon": "🤖",
+    "color": "33dd99",
+    "birthday": "07-20"
+  },
+  "rui": {
+    "name": "神代 類",
+    "icon": "🦄",
+    "color": "bb88ee",
+    "birthday": "06-24"
+  },
+  "kanade": {
+    "name": "宵崎 奏",
+    "icon": "🎼",
+    "color": "bb6688",
+    "birthday": "02-10"
+  },
+  "mafuyu": {
+    "name": "朝比奈 まふゆ",
+    "icon": "❄",
+    "color": "8888cc",
+    "birthday": "01-27"
+  },
+  "ena": {
+    "name": "東雲 絵名",
+    "icon": "🎨",
+    "color": "ccaa88",
+    "birthday": "04-30"
+  },
+  "mizuki": {
+    "name": "暁山 瑞希",
+    "icon": "🎀",
+    "color": "ddaacc",
+    "birthday": "08-27"
+  }
+}
