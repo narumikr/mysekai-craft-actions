@@ -1,0 +1,153 @@
+# .github/workflows/create-release-notes.yml
+name: Create Release Notes
+
+on:
+  workflow_run:
+    workflows: ["Auto Release"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  create-release-notes:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag
+        id: get-previous-tag
+        run: |
+          # Get the latest semver tag (highest version number)
+          git fetch --tags
+          CURRENT_TAG=$(git tag -l "v*.*.*" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1)
+          echo "Current tag: $CURRENT_TAG"
+
+          # Extract major version from current tag
+          MAJOR_VERSION=$(echo "$CURRENT_TAG" | sed 's/^v\([0-9]*\)\..*/\1/')
+          echo "Major version: $MAJOR_VERSION"
+
+          # Get all tags for this major version, sorted by version
+          ALL_TAGS=$(git tag -l "v${MAJOR_VERSION}.*.*" | grep -E "^v${MAJOR_VERSION}\.[0-9]+\.[0-9]+$" | sort -V)
+
+          # Find the previous tag
+          PREVIOUS_TAG=""
+          for tag in $ALL_TAGS; do
+            if [ "$tag" = "$CURRENT_TAG" ]; then
+              break
+            fi
+            PREVIOUS_TAG=$tag
+          done
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "No previous tag found, this is the first release for v${MAJOR_VERSION}"
+            echo "previous_tag=" >> $GITHUB_OUTPUT
+            echo "is_first_release=true" >> $GITHUB_OUTPUT
+          else
+            echo "Previous tag: $PREVIOUS_TAG"
+            echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+            echo "is_first_release=false" >> $GITHUB_OUTPUT
+          fi
+
+          echo "current_tag=$CURRENT_TAG" >> $GITHUB_OUTPUT
+
+      - name: Generate release notes
+        id: generate-notes
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const currentTag = '${{ steps.get-previous-tag.outputs.current_tag }}';
+            const previousTag = '${{ steps.get-previous-tag.outputs.previous_tag }}';
+            const isFirstRelease = '${{ steps.get-previous-tag.outputs.is_first_release }}' === 'true';
+
+            let releaseNotes = '';
+
+            if (isFirstRelease) {
+              releaseNotes = `## ${currentTag}\n\nInitial release for this major version.\n`;
+            } else {
+              // Get merged PRs between previous and current tag with 'dependencies' label
+              const { data: compareData } = await github.rest.repos.compareCommits({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                base: previousTag,
+                head: currentTag
+              });
+
+              // Get all PRs associated with the commits
+              const prNumbers = new Set();
+              for (const commit of compareData.commits) {
+                // Extract PR number from commit message (e.g., "Bump foo from 1.0 to 2.0 (#123)")
+                const prMatch = commit.commit.message.match(/#(\d+)/);
+                if (prMatch) {
+                  prNumbers.add(parseInt(prMatch[1]));
+                }
+              }
+
+              // Filter PRs with 'dependencies' label (Dependabot PRs)
+              const dependabotPRs = [];
+              for (const prNumber of prNumbers) {
+                try {
+                  const { data: pr } = await github.rest.pulls.get({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: prNumber
+                  });
+
+                  const hasDependenciesLabel = pr.labels.some(
+                    label => label.name === 'dependencies' || label.name === 'dependabot'
+                  );
+
+                  if (hasDependenciesLabel) {
+                    dependabotPRs.push({
+                      number: prNumber,
+                      title: pr.title,
+                      url: pr.html_url
+                    });
+                  }
+                } catch (error) {
+                  console.log(`Could not fetch PR #${prNumber}: ${error.message}`);
+                }
+              }
+
+              // Generate release notes
+              releaseNotes = `## ${currentTag}\n\n`;
+
+              if (dependabotPRs.length > 0) {
+                releaseNotes += `### Dependencies\n\n`;
+                for (const pr of dependabotPRs) {
+                  releaseNotes += `- [${pr.title}](${pr.url}) (#${pr.number})\n`;
+                }
+              } else {
+                releaseNotes += `No dependency updates in this release.\n`;
+              }
+
+              releaseNotes += `\n**Full Changelog**: https://github.com/${context.repo.owner}/${context.repo.repo}/compare/${previousTag}...${currentTag}`;
+            }
+
+            core.setOutput('release_notes', releaseNotes);
+            console.log('Generated release notes:\n' + releaseNotes);
+
+      - name: Create GitHub Release
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const currentTag = '${{ steps.get-previous-tag.outputs.current_tag }}';
+            const releaseNotes = ${{ toJSON(steps.generate-notes.outputs.release_notes) }};
+
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: currentTag,
+              name: `${currentTag} 🎶`,
+              body: releaseNotes,
+              draft: false,
+              prerelease: false
+            });
+
+            console.log(`Created release for ${currentTag}`);

@@ -1,0 +1,16 @@
+name: prsk notice dependabot PR
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  rename-pr:
+    permissions:
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rename PR Title with prsk
+        uses: narumikr/link-sekai-actions/prsk-dependabot@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
