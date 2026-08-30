@@ -1,0 +1,57 @@
+name: 'Notice Birthday with Project SEKAI'
+description: 'Notice Project SEKAI character birthdays to a Discord text channel'
+author: 'narumikr'
+
+inputs:
+  discord-webhook:
+    description: 'Discord webhook URL of the text channel to notice'
+    required: true
+  notice-days-before:
+    description: 'Comma separated days before the birthday (e.g. "7,3,0"). 0 means the birthday itself'
+    required: false
+    default: '0'
+  timezone:
+    description: 'IANA timezone used to decide the current date (e.g. Asia/Tokyo)'
+    required: false
+    default: 'Asia/Tokyo'
+  character-keys:
+    description: 'Comma separated character keys to notice. Empty means every character'
+    required: false
+    default: ''
+  mention:
+    description: 'Text prepended to the message for mentions (e.g. "<@&123456789012345678>")'
+    required: false
+    default: ''
+  webhook-username:
+    description: 'Display name of the webhook message'
+    required: false
+    default: 'プロセカ誕生日おしらせ'
+  dry-run:
+    description: 'Build the message and log it without sending to Discord'
+    required: false
+    default: 'false'
+
+outputs:
+  count:
+    description: 'Number of noticed characters'
+    value: ${{ steps.notice-birthday.outputs.count }}
+  notified:
+    description: 'JSON array of noticed characters'
+    value: ${{ steps.notice-birthday.outputs.notified }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Notice Birthday
+      id: notice-birthday
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        DISCORD_WEBHOOK: ${{ inputs.discord-webhook }}
+        NOTICE_DAYS_BEFORE: ${{ inputs.notice-days-before }}
+        TIMEZONE: ${{ inputs.timezone }}
+        CHARACTER_KEYS: ${{ inputs.character-keys }}
+        MENTION: ${{ inputs.mention }}
+        WEBHOOK_USERNAME: ${{ inputs.webhook-username }}
+        DRY_RUN: ${{ inputs.dry-run }}
+      run: node "${ACTION_PATH}/workflow.js"

@@ -1,0 +1,45 @@
+name: prsk birthday notice
+
+on:
+  schedule:
+    # 毎日 09:00 JST (00:00 UTC)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      notice-days-before:
+        description: '何日前に通知するか（カンマ区切り / 0は当日）'
+        required: false
+        type: string
+        default: '7,3,0'
+      dry-run:
+        description: 'Discordへ送信せずログ出力のみ行う'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  notice-birthday:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Notice birthday
+        id: notice
+        uses: ./prsk-birthday
+        with:
+          discord-webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          notice-days-before: ${{ inputs.notice-days-before || '7,3,0' }}
+          dry-run: ${{ inputs.dry-run || false }}
+
+      - name: Show result
+        shell: bash
+        env:
+          COUNT: ${{ steps.notice.outputs.count }}
+          NOTIFIED: ${{ steps.notice.outputs.notified }}
+        run: |
+          echo "count: ${COUNT}"
+          echo "notified: ${NOTIFIED}"
