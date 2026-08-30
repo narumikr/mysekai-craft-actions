@@ -142,8 +142,8 @@ function buildEmbed(entry) {
     title: `${character.icon} ${character.name}`,
     description:
       daysBefore === 0
-        ? 'お誕生日おめでとう🎂 今日はたくさんお祝いしよう💫'
-        : `誕生日まであと${daysBefore}日です。お祝いの準備をはじめましょう💫`,
+        ? 'お誕生日おめでとう🎂 今日はたくさんお祝いしよう🎉'
+        : `誕生日まであと${daysBefore}日です。お祝いの準備をはじめましょう🥂`,
     color: hexToColor(character.color),
     fields: [{ name: '誕生日', value: formatMonthDayJa(character.birthday), inline: true }],
   };
