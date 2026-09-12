@@ -2,8 +2,8 @@ name: prsk birthday notice
 
 on:
   schedule:
-    # 毎日 09:00 JST (00:00 UTC)
-    - cron: '0 0 * * *'
+    # 毎日 00:00 JST (前日 15:00 UTC)
+    - cron: '0 15 * * *'
   workflow_dispatch:
     inputs:
       notice-days-before:
