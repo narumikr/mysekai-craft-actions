@@ -23,13 +23,11 @@
 - **事前通知** : 当日だけでなく、`notice-days-before`で指定した日数前にもお知らせできます（例: `7,3,0`）
 - **タイムゾーン指定** : `timezone`で判定に使う日付のタイムゾーンを指定できます（デフォルトは`Asia/Tokyo`）
 - **キャラクターの絞り込み** : `character-keys`で通知したい推しキャラだけに限定できます
-- **メンション** : `mention`にロールやユーザーのメンションを指定すると、通知の先頭に付与されます
 
+#### 事前準備
 
-**※ ファンメイド作品です**
-
-私の大好きなプロセカという作品、でもイラストは描けない、書き物や工作なども難しい。
-でも何かしら創作をしたいという想いから作り始めました💫
+1. Discordで通知したいテキストチャンネルを開き、`チャンネルの編集` → `連携サービス` → `ウェブフックを作成` からWebhook URLを取得します
+2. 取得したURLを、リポジトリの `Settings` → `Secrets and variables` → `Actions` に `DISCORD_WEBHOOK` として登録します
 
 
 ### 🎪 **_How to use_** 🎪![WONDERLANDS-SHOWTIME-divider](https://capsule-render.vercel.app/api?type=rect&height=2&color=0:ff9900,100:f5f5f7)
@@ -45,8 +43,8 @@ name: prsk birthday notice
 
 on:
   schedule:
-    # 毎日 09:00 JST (00:00 UTC)
-    - cron: '0 0 * * *'
+    # 毎日 00:00 JST (前日 15:00 UTC)
+    - cron: '0 15 * * *'
   workflow_dispatch:
 
 jobs:
@@ -54,35 +52,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Notice birthday
-        uses: narumikr/mysekai-craft-actions/prsk-birthday@v0
+        uses: narumikr/mysekai-craft-actions/prsk-birthday@v1
         with:
           discord-webhook: ${{ secrets.DISCORD_WEBHOOK }}
           notice-days-before: '7,3,0'
+          # 日付の判定に使うタイムゾーン（未指定なら Asia/Tokyo）
+          # timezone: 'Asia/Tokyo'
+          # 通知したい推しキャラだけに絞る（未指定なら全キャラ）
+          # 指定できるキーは common/prsk-profile.constants.json を参照
+          # character-keys: 'miku,ichika,kanade'
+          # Webhookの表示名（未指定なら プロセカ誕生日おしらせ）
+          # webhook-username: 'プロセカ誕生日おしらせ'
 ```
 
-#### 事前準備
+> [!note]
+> `@v1`の部分には、利用したいバージョンタグを指定してください（例: `@v1`, `@v1.0.0`など）。最新のリリースバージョンは[Releases](https://github.com/narumikr/mysekai-craft-actions/releases)ページで確認できます。
 
-1. Discordで通知したいテキストチャンネルを開き、`チャンネルの編集` → `連携サービス` → `ウェブフックを作成` からWebhook URLを取得します
-2. 取得したURLを、リポジトリの `Settings` → `Secrets and variables` → `Actions` に `DISCORD_WEBHOOK` として登録します
+**※ ファンメイド作品です**
 
-#### Inputs
-
-| name | required | default | description |
-| --- | --- | --- | --- |
-| `discord-webhook` | ✅ | - | 通知先テキストチャンネルのDiscord Webhook URL |
-| `notice-days-before` | - | `0` | 何日前に通知するか（カンマ区切り）。`0`は当日 |
-| `timezone` | - | `Asia/Tokyo` | 日付の判定に使うタイムゾーン |
-| `character-keys` | - | （全キャラ） | 通知対象のキャラクターキー（カンマ区切り）。例: `miku,ichika` |
-| `mention` | - | - | 通知の先頭に付けるメンション。例: `<@&123456789012345678>` |
-| `webhook-username` | - | `プロセカ誕生日おしらせ` | Webhookの表示名 |
-| `dry-run` | - | `false` | `true`のとき、Discordへ送信せずログ出力のみ行う |
-
-#### Outputs
-
-| name | description |
-| --- | --- |
-| `count` | 通知したキャラクターの人数 |
-| `notified` | 通知したキャラクターのJSON配列 |
-
+私の大好きなプロセカという作品、でもイラストは描けない、書き物や工作なども難しい。
+でも何かしら創作をしたいという想いから作り始めました💫
 
 **※本リポジトリはプロセカ公式とは一切関係ありません**

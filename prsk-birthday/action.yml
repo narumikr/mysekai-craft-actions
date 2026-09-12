@@ -18,10 +18,6 @@ inputs:
     description: 'Comma separated character keys to notice. Empty means every character'
     required: false
     default: ''
-  mention:
-    description: 'Text prepended to the message for mentions (e.g. "<@&123456789012345678>")'
-    required: false
-    default: ''
   webhook-username:
     description: 'Display name of the webhook message'
     required: false
@@ -51,7 +47,6 @@ runs:
         NOTICE_DAYS_BEFORE: ${{ inputs.notice-days-before }}
         TIMEZONE: ${{ inputs.timezone }}
         CHARACTER_KEYS: ${{ inputs.character-keys }}
-        MENTION: ${{ inputs.mention }}
         WEBHOOK_USERNAME: ${{ inputs.webhook-username }}
         DRY_RUN: ${{ inputs.dry-run }}
       run: node "${ACTION_PATH}/workflow.js"
