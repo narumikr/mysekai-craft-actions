@@ -69,7 +69,6 @@ async function main() {
 
   const payloads = buildPayloads(entries, {
     username: (process.env.WEBHOOK_USERNAME || '').trim() || DEFAULT_WEBHOOK_USERNAME,
-    mention: (process.env.MENTION || '').trim(),
   });
 
   await sendNotifications(webhookUrl, payloads, { dryRun });

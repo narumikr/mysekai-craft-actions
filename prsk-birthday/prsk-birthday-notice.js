@@ -150,18 +150,18 @@ function buildEmbed(entry) {
 }
 
 // Discord accepts up to 10 embeds per message, so split entries into chunks
-function buildPayloads(entries, { username, mention }) {
+function buildPayloads(entries, { username }) {
   const payloads = [];
 
   for (let index = 0; index < entries.length; index += MAX_EMBEDS_PER_MESSAGE) {
     const chunk = entries.slice(index, index + MAX_EMBEDS_PER_MESSAGE);
-    const content = [mention, ...chunk.map(buildHeadline)].filter(Boolean).join('\n');
+    const content = chunk.map(buildHeadline).join('\n');
 
     payloads.push({
       username,
       content,
       embeds: chunk.map(buildEmbed),
-      allowed_mentions: { parse: ['roles', 'users'] },
+      allowed_mentions: { parse: [] },
     });
   }
 
